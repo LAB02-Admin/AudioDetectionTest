@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32112.339
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AudioDetectionTest", "AudioDetectionTest\AudioDetectionTest.csproj", "{3F7FDDC4-93E9-4EE6-A12D-A221B88B98B3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3F7FDDC4-93E9-4EE6-A12D-A221B88B98B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3F7FDDC4-93E9-4EE6-A12D-A221B88B98B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3F7FDDC4-93E9-4EE6-A12D-A221B88B98B3}.Debug|x64.ActiveCfg = Debug|x64
+		{3F7FDDC4-93E9-4EE6-A12D-A221B88B98B3}.Debug|x64.Build.0 = Debug|x64
+		{3F7FDDC4-93E9-4EE6-A12D-A221B88B98B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3F7FDDC4-93E9-4EE6-A12D-A221B88B98B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3F7FDDC4-93E9-4EE6-A12D-A221B88B98B3}.Release|x64.ActiveCfg = Release|x64
+		{3F7FDDC4-93E9-4EE6-A12D-A221B88B98B3}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4A698687-2E55-48D2-B29C-A59B62B0BA2B}
+		VisualSVNWorkingCopyRoot = .
+	EndGlobalSection
+EndGlobal
