@@ -15,7 +15,6 @@ namespace AudioDetectionTest.Functions
     internal static class AudioManager
     {
         private static readonly Dictionary<int, string> ApplicationNames = new Dictionary<int, string>();
-        private static MMDevice _audioDevice;
         
         private static bool _active = true;
 
@@ -40,6 +39,18 @@ namespace AudioDetectionTest.Functions
 
                 // launch monitor
                 Task.Run(MonitorAudioDevices);
+
+                // launch gc cleaner
+                Task.Run(async delegate
+                {
+                    while (_active)
+                    {
+                        await Task.Delay(TimeSpan.FromMinutes(5));
+
+                        GC.Collect();
+                        GC.WaitForPendingFinalizers();
+                    }
+                });
 
                 // done
                 Log.Information("[AUDIOMANAGER] Initialization complete");
@@ -71,33 +82,29 @@ namespace AudioDetectionTest.Functions
                     try
                     {
                         // get the default audio device
-                        _audioDevice = Variables.DefaultDeviceEnumerator.GetDefaultAudioEndpoint(EDataFlow.eRender, ERole.eMultimedia);
-                        if (_audioDevice == null)
+                        using (var audioDevice = Variables.DefaultDeviceEnumerator.GetDefaultAudioEndpoint(EDataFlow.eRender, ERole.eMultimedia))
                         {
-                            Log.Error("[AUDIOMANAGER] Unable to retrieve an audio device");
-                            Variables.FrmM.CriticalError("Error while retrieving info.\r\n\r\nPlease consult the logs for more info.");
-                            return;
+                            // show the name
+                            Variables.FrmM.SetAudioDevice(audioDevice.FriendlyName);
+
+                            // show the state
+                            var deviceState = GetReadableState(audioDevice.State);
+                            Variables.FrmM.SetAudioDeviceState(deviceState);
+
+                            // show the volume
+                            var masterVolume = (int)(audioDevice.AudioEndpointVolume?.MasterVolumeLevelScalar * 100 ?? 0);
+                            Variables.FrmM.SetMasterVolume(masterVolume);
+
+                            // get session and volume info
+                            var sessionInfos = GetSessions(out var peakVolume);
+
+                            // show session info
+                            Variables.FrmM.SetSessionInfo(sessionInfos);
+
+                            // show peak volume
+                            Variables.FrmM.SetPeakVolume(peakVolume);
                         }
-                        
-                        // show the name
-                        Variables.FrmM.SetAudioDevice(_audioDevice.FriendlyName);
 
-                        // show the state
-                        var deviceState = GetReadableState(_audioDevice.State);
-                        Variables.FrmM.SetAudioDeviceState(deviceState);
-
-                        // show the volume
-                        var masterVolume = (int)(_audioDevice.AudioEndpointVolume?.MasterVolumeLevelScalar * 100 ?? 0);
-                        Variables.FrmM.SetMasterVolume(masterVolume);
-
-                        // get session and volume info
-                        var sessionInfos = GetSessions(out var peakVolume);
-
-                        // show session info
-                        Variables.FrmM.SetSessionInfo(sessionInfos);
-
-                        // show peak volume
-                        Variables.FrmM.SetPeakVolume(peakVolume);
                     }
                     catch (Exception ex)
                     {
@@ -128,9 +135,6 @@ namespace AudioDetectionTest.Functions
 
                 foreach (var device in Variables.DefaultDeviceEnumerator.EnumerateAudioEndPoints(EDataFlow.eRender, DEVICE_STATE.DEVICE_STATE_ACTIVE))
                 {
-                    // refresh all sessions
-                    device.AudioSessionManager2?.RefreshSessions();
-
                     // process sessions (and get peak volume)
                     foreach (var session in device.AudioSessionManager2?.Sessions.Where(x => x != null))
                     {
@@ -189,7 +193,8 @@ namespace AudioDetectionTest.Functions
                         }
                         finally
                         {
-                            // session?.Dispose();
+                            session?.Dispose();
+                            device?.Dispose();
                         }
                     }
                 }
